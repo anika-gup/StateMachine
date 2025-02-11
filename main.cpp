@@ -1,10 +1,12 @@
 #include <string.h>
+#include <string>
+#include <typeinfo>
 #include <iostream>
 #include "node.h"
 
 using namespace std;
 
-void ADDVERTEX(int count, int graph[20][20],  char** names, node* nodeGraph[20], node* addNode);
+void ADDVERTEX(int count, int graph[20][20],  char** names, node* addNode);
 void ADDEDGE(int count, int graph[20][20], char** names);
 
 void PRINTLABELS(int count, char** names);
@@ -21,14 +23,14 @@ void printQueue(node* qhead);
 
 void findShortest(int count, int graph[20][20], char** names, node* &qhead);
 
-void validLanguage(int count, int graph[20][20], char** names, int languageInput, node* nodeGraph[20]);
+void validLanguage(int count, int graph[20][20], char** names, int languageInput, char* startNodeLabel, int lenLeft, int countThroughInputLanguage);
 
-void touchingEdges(int count, int graph[20][20], char** names, node* nodeGraph[20], int startEdgeIndex);
+void touchingEdges(int count, int graph[20][20], char** names,  int startEdgeIndex);
 void printArray();
 /*
 Graph Creator
 Anika Gupta
-Can add/remove vertices and edges, and find shortest path using Dijkstra's Algorithm
+Create state machine and check if a language is valid.
  */
 
 // beware i used a global variable... sincerest apologies.......
@@ -36,6 +38,14 @@ int touchingEdgesArray[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 // for (int ll=0; ll<20; ll++) {
 //   touchingEdgesArray[ll] = 0;
 //  }
+
+bool isValid = false;
+
+node* nodeGraph[20];
+node* nullNode = NULL;
+for (int m=0; m<20; m++) {
+  nodeGraph[m] = nullnode;
+}
 int main() {
   int count = -1;
 
@@ -59,13 +69,14 @@ int main() {
     strcpy(text, "" ) ;
     names[a] = text ;
   }
-
+  /*
   node* nodeGraph[20];
   node* nullnode = NULL;
   for (int m=0; m<20; m++) {
       nodeGraph[m] = nullnode;
     
   }
+  */
   node* qhead = NULL;
   node* addNode = new node();
   int quit = 0;
@@ -85,10 +96,18 @@ int main() {
     }
     else if (strcmp(input, "VALIDLANGUAGE")==0) {
       cout << "What is the string that you want to check is a valid language or not? Only integers hehe :)" ;
+      isValid = false;
       int languageInput;
       cin >> languageInput;
       cout << endl;
-      validLanguage(count, graph, names, languageInput, nodeGraph);
+      cout << "What's the starting node's label?" << endl;
+      char* startNodeLabel = new char[20];
+      cin >> startNodeLabel;
+      int lenLeft = to_string(languageInput).length() + 1;
+      int countThroughInputLanguage = 0;
+      validLanguage(count, graph, names, languageInput,  startNodeLabel, lenLeft, countThroughInputLanguage);
+      
+      
     }
     else if (strcmp(input, "ENQUEUE")==0) {
       int num;
@@ -125,7 +144,7 @@ int main() {
   return 0;
 }
 
-void ADDVERTEX(int count, int graph[20][20], char** names, node* nodeGraph[20], node* addNode) {
+void ADDVERTEX(int count, int graph[20][20], char** names, node* addNode) {
   // Adds a vertex (creates new label)
 
   
@@ -142,13 +161,18 @@ void ADDVERTEX(int count, int graph[20][20], char** names, node* nodeGraph[20], 
   cin >> acceptYesNo;
   if (strcmp(acceptYesNo, "yes")==0) {
     addNode->setAccept(true);
+    cout << "set accept true." << endl;
+  }
+  else {
+    addNode->setAccept(false);
+    cout << "set accept false." << endl;
   }
   addNode->setLabel(Label);
   nodeGraph[count] = addNode;
   cout << "Label is: " << Label << endl;
 }
 
-void touchingEdges(int count, int graph[20][20], char** names, node* nodeGraph[20], int startEdgeIndex) {
+void touchingEdges(int count, int graph[20][20], char** names,  int startEdgeIndex) {
   //startEdgeIndex is the index value that is the index of the thing we want to check
   // if we want to go from name with index value 1, we need to add values from column of index value to an array and then return it (make the return function later)/
 
@@ -207,26 +231,56 @@ void PRINTLABELS(int count, char** names) {
   cout << endl;
 }
 
-void validLanguage(int count, int graph[20][20], char** names, int inputLanguage, node* nodeGraph[20]) {
+void validLanguage(int count, int graph[20][20], char** names, int inputLanguage,  char* startNodeLabel, int lenLeft, int countThroughInputLanguage) {
   //cout << "the language I am checking validity for is: " ;
   //cout << inputLanguage << endl;
-  cout << "What is the label of your starting node?" << endl;
-  char* startNodeLabel = new char[20];
-  cin >> startNodeLabel;
-  cout << "nice label..." << endl;
+  //cout << "nice label..." << endl;
   int startNodeIndex = SEARCH(count, names, startNodeLabel);
-  cout << "just set start node index" << endl;
+  //cout << "just set start node index" << endl;
   if (startNodeIndex==-1) {
     cout << "sorry to break it to you bud. that node isn't in this graph.." << endl;
   }
   else {
-    int countThroughInputLanguage = 0;
+    lenLeft = lenLeft - 1;
+    if (lenLeft == 0) {
+      node* cur = nodeGraph[startNodeIndex];
+      if (cur->getAccept()==true) {
+	cout << "cur: " << cur->getLabel() << endl;
+	cout << "it is a valid language yay!" << endl;
+	isValid = true;
+      }
+      return;
+    }
+    //int countThroughInputLanguage = 0;
     //int touchEdgesArray[20] =
-    touchingEdges(count, graph, names, nodeGraph, startNodeIndex);
+    touchingEdges(count, graph, names,  startNodeIndex);
+    cout << to_string(inputLanguage)[countThroughInputLanguage] << endl;
+    //cout << typeid(touchingEdgesArray[0]).name()<< endl;
+    //char* inputLanguageStr = new char[30];
+    string inputLanguageStr = to_string(inputLanguage);
+    //cout <<"input language str: " << inputLanguageStr << endl;
+    char otherVal = inputLanguageStr.at(countThroughInputLanguage);
+    
+    int otherValInt = otherVal - '0';
     for (int a=0; a<20; a++) {
-      if (touchingEdgesArray[a] == inputLanguage[countThroughInputLanguage]) {
-	  cout << "nice.." << endl;
+      //char val = char(touchingEdgesArray[a]);
+      char val = static_cast<char>(touchingEdgesArray[a]); // THIS IS NOT BEING CONVERTED PROPERLY....
+      int valInt = touchingEdgesArray[a];
+      //cout << "valint: " << valInt << endl;
+      //cout << touchingEdgesArray[a] << endl;
+      //cout << "other valint: " << otherValInt << endl;
+      //cout << "other val: " << otherVal << endl;
+      //int comp = val.compare(otherVal);
+      //cout << comp << endl;
+      //if (comp==0) {
+      if (touchingEdgesArray[a]==otherValInt) {
+	  cout << "THEY EQUAL EACH OTHER..." << endl;
+	  char* newStartNodeLabel = names[a];
+	  countThroughInputLanguage += 1;
+	  cout << "calling valid language again, this time on " << names[a] << " with countthroguhinputlanguage as: " << countThroughInputLanguage << endl;
+	  validLanguage(count, graph, names, inputLanguage, nodeGraph, newStartNodeLabel, lenLeft, countThroughInputLanguage);
 	  // we go to a.  have to recursively call something. idk. too lazy. so sad. AHH i'm done.
+	  
       }
     }
   }
