@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void ADDVERTEX(int count, int graph[20][20],  char** names, node* addNode);
+void ADDVERTEX(int count, int graph[20][20],  char** names);
 void ADDEDGE(int count, int graph[20][20], char** names);
 
 void PRINTLABELS(int count, char** names);
@@ -42,10 +42,11 @@ int touchingEdgesArray[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 bool isValid = false;
 
 node* nodeGraph[20];
-node* nullNode = NULL;
-for (int m=0; m<20; m++) {
-  nodeGraph[m] = nullnode;
-}
+
+
+
+
+
 int main() {
   int count = -1;
 
@@ -72,13 +73,15 @@ int main() {
   /*
   node* nodeGraph[20];
   node* nullnode = NULL;
+  */
+  node* nullnode = NULL;
   for (int m=0; m<20; m++) {
-      nodeGraph[m] = nullnode;
+      nodeGraph[m] = NULL;
     
   }
-  */
+  //*/
   node* qhead = NULL;
-  node* addNode = new node();
+  //  node* addNode = new node();
   int quit = 0;
   while (quit==0) {
     //giving user options
@@ -92,7 +95,7 @@ int main() {
     if (strcmp(input, "ADDVERTEX")==0) {
       // create then call this funct
       count++;
-      ADDVERTEX(count, graph, names, nodeGraph, addNode);
+      ADDVERTEX(count, graph, names);
     }
     else if (strcmp(input, "VALIDLANGUAGE")==0) {
       cout << "What is the string that you want to check is a valid language or not? Only integers hehe :)" ;
@@ -144,7 +147,7 @@ int main() {
   return 0;
 }
 
-void ADDVERTEX(int count, int graph[20][20], char** names, node* addNode) {
+void ADDVERTEX(int count, int graph[20][20], char** names) {
   // Adds a vertex (creates new label)
 
   
@@ -153,6 +156,8 @@ void ADDVERTEX(int count, int graph[20][20], char** names, node* addNode) {
   char* Label = new char[50];
   cin >> Label;
   names[count] = Label;
+  node* copyNewNode = new node();
+  
   cout << "added to label names blah" << endl;
   //node* addNode = new node();
   cout << "made new node..." << endl;
@@ -160,16 +165,21 @@ void ADDVERTEX(int count, int graph[20][20], char** names, node* addNode) {
   char* acceptYesNo = new char[10];
   cin >> acceptYesNo;
   if (strcmp(acceptYesNo, "yes")==0) {
-    addNode->setAccept(true);
+    //    addNode->setAccept(true);
+    copyNewNode->setAccept(true);
     cout << "set accept true." << endl;
   }
   else {
-    addNode->setAccept(false);
+    //addNode->setAccept(false);
+    copyNewNode->setAccept(false);
     cout << "set accept false." << endl;
   }
-  addNode->setLabel(Label);
-  nodeGraph[count] = addNode;
+  //addNode->setLabel(Label);
+  copyNewNode->setLabel(Label);
+  //  nodeGraph[count] = addNode;
+  nodeGraph[count] = copyNewNode;
   cout << "Label is: " << Label << endl;
+  //delete copyNewNode;
 }
 
 void touchingEdges(int count, int graph[20][20], char** names,  int startEdgeIndex) {
@@ -278,7 +288,7 @@ void validLanguage(int count, int graph[20][20], char** names, int inputLanguage
 	  char* newStartNodeLabel = names[a];
 	  countThroughInputLanguage += 1;
 	  cout << "calling valid language again, this time on " << names[a] << " with countthroguhinputlanguage as: " << countThroughInputLanguage << endl;
-	  validLanguage(count, graph, names, inputLanguage, nodeGraph, newStartNodeLabel, lenLeft, countThroughInputLanguage);
+	  validLanguage(count, graph, names, inputLanguage, newStartNodeLabel, lenLeft, countThroughInputLanguage);
 	  // we go to a.  have to recursively call something. idk. too lazy. so sad. AHH i'm done.
 	  
       }
